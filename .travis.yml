@@ -8,15 +8,10 @@ rvm:
 - 1.9.3
 - 1.8.7
 env:
-- REDMINE_VER=2.0.4 DB=mysql
-- REDMINE_VER=2.1.6 DB=mysql
-- REDMINE_VER=2.2.1 DB=mysql
+- REDMINE_VER=1.4.6 DB=sqlite
 - REDMINE_VER=2.0.4 DB=sqlite
 - REDMINE_VER=2.1.6 DB=sqlite
 - REDMINE_VER=2.2.1 DB=sqlite
-- REDMINE_VER=2.0.4 DB=postgresql
-- REDMINE_VER=2.1.6 DB=postgresql
-- REDMINE_VER=2.2.1 DB=postgresql
 matrix:
   allow_failures:
   - rvm: jruby-18mode
@@ -54,14 +49,6 @@ script:
 - bash -x ./redmine_install.sh -t features/routes.feature
 - bash -x ./redmine_install.sh -t features/scrum_master.feature
 - bash -x ./redmine_install.sh -t features/settings.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-burndown.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-chief_product_owner2.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-chief_product_owner.feature
-- bash -x ./redmine_install.sh -t features/shared-versions.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-pblpage.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-positioning.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-scrum_master-dnd.feature
-- bash -x ./redmine_install.sh -t features/shared-versions-team_member-dnd.feature
 - bash -x ./redmine_install.sh -t features/sidebar.feature
 - bash -x ./redmine_install.sh -t features/team_member.feature
 - bash -x ./redmine_install.sh -t features/ui.feature
