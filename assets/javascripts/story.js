@@ -78,8 +78,17 @@ RB.Story = RB.Object.create(RB.Issue, RB.EditableInplace, {
     return ( isNaN(points) ? 0 : points );
   },
 
+  isEstimated: function(){	
+	points = parseFloat( this.$.find('.story_points').first().text() );
+	return ( isNaN(points) ? false : true );
+  },
+
   getTracker: function(){
 	return this.$.find('.tracker_id .t').text();
+  },
+  
+  getProject: function(){
+        return this.$.find('.project .t').text();
   },
 
   getType: function(){

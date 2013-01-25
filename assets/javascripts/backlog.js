@@ -295,25 +295,74 @@ RB.Backlog = RB.Object.create({
         scrollTop: sprint_backlog.find('.editor').first().offset().top
         }, 200);
   },
-
+  
   recalcVelocity: function(){
+    var tracker_by_project = new Array();
     var tracker_total = new Array();
     total = 0;
+    total_count_unestimated = 0;
+    total_count_estimated = 0;
     this.getStories().each(function(index){
       var story = RB.$(this).data('this');
       var story_tracker = story.getTracker();
+      var story_project = story.getProject();
+      var story_estimated = story.isEstimated();
       total += RB.$(this).data('this').getPoints();
+      if (story_estimated)
+        total_count_estimated += 1;
+      else
+        total_count_unestimated += 1;
       if ('undefined' == typeof(tracker_total[story_tracker])) {
-         tracker_total[story_tracker] = 0;
+        tracker_total[story_tracker] = new Array();
+        tracker_total[story_tracker]['points'] = 0;
+        tracker_total[story_tracker]['count'] = 0;
+        tracker_total[story_tracker]['count_unestimated'] = 0;
+        tracker_total[story_tracker]['count_estimated'] = 0;
       }
-      tracker_total[story_tracker] += story.getPoints();
+      tracker_total[story_tracker]['points'] += story.getPoints();
+      tracker_total[story_tracker]['count'] += 1;
+      tracker_total[story_tracker][story_estimated ? 'count_estimated' : 'count_unestimated'] += 1;
+      if ('undefined' == typeof(tracker_by_project[story_project]))
+        tracker_by_project[story_project] = new Array();
+      if ('undefined' == typeof(tracker_by_project[story_project][story_tracker])) {
+        tracker_by_project[story_project][story_tracker] = new Array();
+        tracker_by_project[story_project][story_tracker]['points'] = 0;
+        tracker_by_project[story_project][story_tracker]['count'] = 0;
+        tracker_by_project[story_project][story_tracker]['count_unestimated'] = 0;
+        tracker_by_project[story_project][story_tracker]['count_estimated'] = 0;
+      }
+      tracker_by_project[story_project][story_tracker]['points'] += story.getPoints();
+      tracker_by_project[story_project][story_tracker]['count'] += 1;
+      tracker_by_project[story_project][story_tracker][story_estimated ? 'count_estimated' : 'count_unestimated'] += 1;
     });
     var sprint_points = this.$.children('.header').children('.velocity');
     sprint_points.text(total);
-    var tracker_summary = "<b>Tracker statistics</b><br />";
+    var tracker_summary = '<table><col class="wide"/><col class="wide"/><col class="wide"/><col class="tight"/><col class="tight"/><tr><th>Project</th><th>Tracker</th><th>Point(s)</th><th>Estimated</th><th>Unestimated</th></tr>';
+
+    // All projects
+    tracker_summary += '<tr class="totalRow"><td>All</td><td>' + (total_count_estimated + total_count_unestimated) + ' item' + (total_count_estimated + total_count_unestimated > 1 ? 's' : '') +'</td><td>' + total.toFixed(1) + '</td><td>' + total_count_estimated + '</td><td>' + total_count_unestimated + '</td></tr>';
     for (var t in tracker_total) {
-       tracker_summary += '<b>' + t + ':</b> ' + tracker_total[t] + '<br />';
+      tracker_summary += '<tr><td>&nbsp;</td><td>' + tracker_total[t]['count'] + ' <i>' + t + '</i></td><td>' + tracker_total[t]['points'].toFixed(1) + '</td><td>' + tracker_total[t]['count_estimated'] + '</td><td>' + tracker_total[t]['count_unestimated'] + '</td></tr>';
     }
+
+    // By project
+    for (var p in tracker_by_project) {
+	  var project_html = '';
+      var points = 0;
+      var unestimated_count = 0;
+      var estimated_count = 0;
+      for (var t in tracker_by_project[p]) {
+        points += tracker_by_project[p][t]['points'];
+        unestimated_count +=  tracker_by_project[p][t]['count_unestimated'];
+        estimated_count +=  tracker_by_project[p][t]['count_estimated'];
+        project_html += '<tr><td>&nbsp;</td><td>' + tracker_by_project[p][t]['count'] + ' <i>' + t + '</i></td><td>' + tracker_by_project[p][t]['points'].toFixed(1) + '</td><td>' + tracker_by_project[p][t]['count_estimated'] + '</td><td>' + tracker_by_project[p][t]['count_unestimated'] + '</td></tr>';
+      }
+      tracker_summary += '<tr><td colspan="5" class="separator"</td></tr>';
+      tracker_summary += '<tr class="totalRow"><td>' + p + '</td><td>' + (estimated_count + unestimated_count) + ' item' + (estimated_count + unestimated_count > 1 ? 's' : '') + '</td><td>' + points.toFixed(1) + '</td><td>' + estimated_count + '</td><td>' + unestimated_count + '</td></tr>';
+      tracker_summary += project_html;
+    }
+    tracker_summary += '</table>';
+
     sprint_points.qtip('option', 'content.text', tracker_summary);
   },
 
