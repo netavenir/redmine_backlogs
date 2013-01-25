@@ -253,6 +253,11 @@
         Backlogs.setting[:sharing_enabled]) %>
   </p>
   <p>
+    <%= content_tag(:label, l(:backlogs_restricted_sprint_view)) %>
+    <%= check_box_tag("settings[restricted_sprint_view]", 'enabled',
+        Backlogs.setting[:restricted_sprint_view]) %>
+  </p>
+  <p>
     <%= content_tag(:label, l(:backlogs_sharing_new_sprint)) %>
     <%= select_tag("settings[sharing_new_sprint_sharingmode]",
         options_for_select(

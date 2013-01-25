@@ -36,8 +36,9 @@ class RbStory < Issue
       Backlogs::ActiveRecord.add_condition(options, visible)
     end
 
+		projects_cond = Project.find(project_id).projects_in_shared_product_backlog.map{|p| p.id}.join(',');
     pbl_condition = ["
-      project_id in (#{Project.find(project_id).projects_in_shared_product_backlog.map{|p| p.id}.join(',')})
+      project_id in (#{projects_cond})
       and tracker_id in (?)
       and release_id is NULL
       and fixed_version_id is NULL
@@ -46,6 +47,9 @@ class RbStory < Issue
       sprint_condition = ["
         tracker_id in (?)
         and fixed_version_id IN (?)", RbStory.trackers, sprint_ids]
+			if Backlogs.setting[:restricted_sprint_view]
+				sprint_condition[0] += "and project_id in (#{projects_cond})";
+			end
     else
       sprint_condition = ["
         project_id = ?
@@ -53,7 +57,7 @@ class RbStory < Issue
         and fixed_version_id IN (?)", project_id, RbStory.trackers, sprint_ids]
     end
     release_condition = ["
-      project_id in (#{Project.find(project_id).projects_in_shared_product_backlog.map{|p| p.id}.join(',')})
+      project_id in (#{projects_cond})
       and tracker_id in (?)
       and fixed_version_id is NULL
       and release_id in (?)", RbStory.trackers, release_ids]
