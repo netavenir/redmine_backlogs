@@ -164,6 +164,12 @@ ul li { vertical-align: bottom; } /* close IE7 gap between list items */
   left:160px;
   top:0;
 }
+.backlog .header .fold {
+  position: absolute;
+  right: 0px;
+  top: 7px;
+  cursor: pointer;
+}
 #backlogs_container .header .menu .item .icon {
   position: absolute;
   left:140px;
@@ -209,7 +215,6 @@ ul li { vertical-align: bottom; } /* close IE7 gap between list items */
   float: right;
   position: relative;
   text-align:right;
-  width:28px;
 }
 
   /* container for sprint header (read) */

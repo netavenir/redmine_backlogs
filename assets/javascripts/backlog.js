@@ -53,6 +53,7 @@ RB.Backlog = RB.Object.create({
     });
     
     this.recalcVelocity();
+    this.initFolding();
   },
 
   afterCreate: function(data, textStatus, xhr){
@@ -330,5 +331,19 @@ RB.Backlog = RB.Object.create({
                           title: 'Charts', 
                           width: 710 
                        });
-  }
+  },
+    initFolding: function(){
+	var $stories = this.$.children('.stories');
+	var backlogId = $stories.attr('id').replace(/[^0-9]+/, '') || 0;
+	var $fold = this.$.find('.fold');
+	$fold.bind('click', function(){
+	    RB.$(this).toggleClass('ui-icon-arrowthickstop-1-s').toggleClass('ui-icon-arrowthickstop-1-n');
+	    RB.$(this).parents('.backlog').children('.stories').toggle('bind');
+	    RB.UserPreferences.set('folded-backlog-'+backlogId, RB.$(this).hasClass('ui-icon-arrowthickstop-1-s'));
+	});
+	if (RB.UserPreferences.get('folded-backlog-'+backlogId) == "true"){
+	    $fold.toggleClass('ui-icon-arrowthickstop-1-s').toggleClass('ui-icon-arrowthickstop-1-n');
+	    $stories.hide();
+	}
+    }
 });
